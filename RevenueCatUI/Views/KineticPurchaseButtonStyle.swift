@@ -18,15 +18,30 @@ public extension View {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-struct AnyKineticPurchaseButtonStyle: ButtonStyle {
-    private let render: (Configuration) -> AnyView
+struct AnyKineticPurchaseButtonStyle {
+    private let render: (AnyView) -> AnyView
 
     init<Style: ButtonStyle>(_ style: Style) {
-        render = { AnyView(style.makeBody(configuration: $0)) }
+        // Install the actual style through SwiftUI so its DynamicProperty and
+        // Environment values (disabled, reduced motion/transparency) are resolved.
+        render = { AnyView($0.buttonStyle(style)) }
     }
 
-    func makeBody(configuration: Configuration) -> some View {
-        render(configuration)
+    func apply<Content: View>(to content: Content) -> some View {
+        render(AnyView(content))
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+struct KineticPurchaseButtonStyleModifier: ViewModifier {
+    let style: AnyKineticPurchaseButtonStyle?
+
+    @ViewBuilder func body(content: Content) -> some View {
+        if let style {
+            style.apply(to: content)
+        } else {
+            content
+        }
     }
 }
 

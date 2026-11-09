@@ -84,7 +84,7 @@ struct PurchaseButtonComponentView: View {
         }
         .disabled(self.shouldBeDisabled)
         .opacity(self.shouldBeDisabled ? 0.35 : 1.0)
-        .buttonStyle(self.kineticButtonStyle ?? AnyKineticPurchaseButtonStyle(PlainButtonStyle()))
+        .modifier(KineticPurchaseButtonStyleModifier(style: self.kineticButtonStyle))
         #if canImport(SafariServices) && canImport(UIKit)
         .sheet(isPresented: .isNotNil(self.$inAppBrowserURL)) {
             SafariView(url: self.inAppBrowserURL!)
