@@ -35,10 +35,11 @@ struct AnyKineticPurchaseButtonStyle {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 struct KineticPurchaseButtonStyleModifier: ViewModifier {
     let style: AnyKineticPurchaseButtonStyle?
+    let action: AsyncButton<EmptyView>.Action?
 
     @ViewBuilder func body(content: Content) -> some View {
-        if let style {
-            style.apply(to: content)
+        if let style, let action {
+            style.apply(to: AsyncButton(action: action) { content })
         } else {
             content
         }

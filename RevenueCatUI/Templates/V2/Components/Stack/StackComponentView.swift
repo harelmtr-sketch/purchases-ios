@@ -68,6 +68,8 @@ struct StackComponentView: View {
     private let additionalPadding: EdgeInsets
     private let showActivityIndicatorOverContent: Bool
     private let usesCustomPurchaseButtonStyle: Bool
+    private let purchaseButtonStyle: AnyKineticPurchaseButtonStyle?
+    private let purchaseButtonAction: AsyncButton<EmptyView>.Action?
 
     init(
         viewModel: StackComponentViewModel,
@@ -75,7 +77,9 @@ struct StackComponentView: View {
         onDismiss: @escaping () -> Void,
         additionalPadding: EdgeInsets? = nil,
         showActivityIndicatorOverContent: Bool = false,
-        usesCustomPurchaseButtonStyle: Bool = false
+        usesCustomPurchaseButtonStyle: Bool = false,
+        purchaseButtonStyle: AnyKineticPurchaseButtonStyle? = nil,
+        purchaseButtonAction: AsyncButton<EmptyView>.Action? = nil
     ) {
         self.viewModel = viewModel
         self.isScrollableByDefault = isScrollableByDefault
@@ -83,6 +87,8 @@ struct StackComponentView: View {
         self.additionalPadding = additionalPadding ?? EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
         self.showActivityIndicatorOverContent = showActivityIndicatorOverContent
         self.usesCustomPurchaseButtonStyle = usesCustomPurchaseButtonStyle
+        self.purchaseButtonStyle = purchaseButtonStyle
+        self.purchaseButtonAction = purchaseButtonAction
     }
 
     var body: some View {
@@ -175,6 +181,8 @@ struct StackComponentView: View {
                border: self.usesCustomPurchaseButtonStyle ? nil : style.border,
                shadow: self.usesCustomPurchaseButtonStyle ? nil : style.shadow,
                shape: style.shape)
+        .modifier(KineticPurchaseButtonStyleModifier(style: self.purchaseButtonStyle,
+                                                    action: self.purchaseButtonAction))
         .padding(style.margin)
     }
 

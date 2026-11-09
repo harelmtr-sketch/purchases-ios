@@ -71,25 +71,37 @@ struct PurchaseButtonComponentView: View {
     }
 
     var body: some View {
-        AsyncButton {
-            try await self.purchase()
-        } label: {
-            // Not passing an onDismiss - nothing in this stack should be able to dismiss
-            StackComponentView(
-                viewModel: viewModel.stackViewModel,
-                onDismiss: {},
-                showActivityIndicatorOverContent: self.showActivityIndicatorOverContent,
-                usesCustomPurchaseButtonStyle: self.kineticButtonStyle != nil
-            )
+        Group {
+            if let style = self.kineticButtonStyle {
+                self.purchaseLabel(style: style)
+            } else {
+                AsyncButton {
+                    try await self.purchase()
+                } label: {
+                    self.purchaseLabel()
+                }
+            }
         }
         .disabled(self.shouldBeDisabled)
         .opacity(self.shouldBeDisabled ? 0.35 : 1.0)
-        .modifier(KineticPurchaseButtonStyleModifier(style: self.kineticButtonStyle))
         #if canImport(SafariServices) && canImport(UIKit)
         .sheet(isPresented: .isNotNil(self.$inAppBrowserURL)) {
             SafariView(url: self.inAppBrowserURL!)
         }
         #endif
+    }
+
+    private func purchaseLabel(style: AnyKineticPurchaseButtonStyle? = nil) -> some View {
+        // Only the custom path wraps the content before its authored outer margin.
+        // Nothing in this label can dismiss the paywall.
+        StackComponentView(
+            viewModel: viewModel.stackViewModel,
+            onDismiss: {},
+            showActivityIndicatorOverContent: self.showActivityIndicatorOverContent,
+            usesCustomPurchaseButtonStyle: style != nil,
+            purchaseButtonStyle: style,
+            purchaseButtonAction: style == nil ? nil : { try await self.purchase() }
+        )
     }
 
     private func purchase() async throws {
