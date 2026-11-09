@@ -38,6 +38,9 @@ struct PurchaseButtonComponentView: View {
     @Environment(\.componentInteractionLogger)
     private var componentInteractionLogger
 
+    @Environment(\.kineticPaywallPurchaseButtonStyle)
+    private var kineticButtonStyle
+
     @State private var inAppBrowserURL: URL?
 
     private let viewModel: PurchaseButtonComponentViewModel
@@ -75,11 +78,13 @@ struct PurchaseButtonComponentView: View {
             StackComponentView(
                 viewModel: viewModel.stackViewModel,
                 onDismiss: {},
-                showActivityIndicatorOverContent: self.showActivityIndicatorOverContent
+                showActivityIndicatorOverContent: self.showActivityIndicatorOverContent,
+                usesCustomPurchaseButtonStyle: self.kineticButtonStyle != nil
             )
         }
         .disabled(self.shouldBeDisabled)
         .opacity(self.shouldBeDisabled ? 0.35 : 1.0)
+        .buttonStyle(self.kineticButtonStyle ?? AnyKineticPurchaseButtonStyle(PlainButtonStyle()))
         #if canImport(SafariServices) && canImport(UIKit)
         .sheet(isPresented: .isNotNil(self.$inAppBrowserURL)) {
             SafariView(url: self.inAppBrowserURL!)

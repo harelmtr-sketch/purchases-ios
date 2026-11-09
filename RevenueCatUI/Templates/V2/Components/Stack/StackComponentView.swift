@@ -67,19 +67,22 @@ struct StackComponentView: View {
     /// area when displayed as a sticky footer.
     private let additionalPadding: EdgeInsets
     private let showActivityIndicatorOverContent: Bool
+    private let usesCustomPurchaseButtonStyle: Bool
 
     init(
         viewModel: StackComponentViewModel,
         isScrollableByDefault: Bool = false,
         onDismiss: @escaping () -> Void,
         additionalPadding: EdgeInsets? = nil,
-        showActivityIndicatorOverContent: Bool = false
+        showActivityIndicatorOverContent: Bool = false,
+        usesCustomPurchaseButtonStyle: Bool = false
     ) {
         self.viewModel = viewModel
         self.isScrollableByDefault = isScrollableByDefault
         self.onDismiss = onDismiss
         self.additionalPadding = additionalPadding ?? EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
         self.showActivityIndicatorOverContent = showActivityIndicatorOverContent
+        self.usesCustomPurchaseButtonStyle = usesCustomPurchaseButtonStyle
     }
 
     var body: some View {
@@ -166,9 +169,12 @@ struct StackComponentView: View {
         )
         .shape(border: nil,
                shape: style.shape,
-               background: style.backgroundStyle,
+               background: self.usesCustomPurchaseButtonStyle ? nil : style.backgroundStyle,
                uiConfigProvider: self.viewModel.uiConfigProvider)
-        .apply(badge: style.badge, border: style.border, shadow: style.shadow, shape: style.shape)
+        .apply(badge: style.badge,
+               border: self.usesCustomPurchaseButtonStyle ? nil : style.border,
+               shadow: self.usesCustomPurchaseButtonStyle ? nil : style.shadow,
+               shape: style.shape)
         .padding(style.margin)
     }
 
